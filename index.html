@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accident Reporting App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <p class="eyebrow">AUA Accident Reporting</p>
+      <h1>Accident Statement Analyzer</h1>
+      <p class="subtitle">Paste a driver statement, extract key accident details, classify the accident type, and generate a simple diagram preview.</p>
+    </section>
+
+    <section class="card">
+      <label for="statement">Driver Statement</label>
+      <textarea id="statement" rows="10" placeholder="Example: I was travelling along PIE when the vehicle behind hit the rear of my car after traffic slowed down."></textarea>
+      <div class="actions">
+        <button id="analyzeBtn">Analyze Statement</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <h2>Extracted Details</h2>
+        <div class="form-grid">
+          <label>Accident Type
+            <select id="accidentType">
+              <option>Rear-End</option>
+              <option>Lane Change</option>
+              <option>Side Swipe</option>
+              <option>Head-On</option>
+              <option>Parking / Stationary</option>
+              <option>Unclear / Manual Review</option>
+            </select>
+          </label>
+          <label>Vehicle A Role
+            <select id="vehicleARole">
+              <option>Front Vehicle</option>
+              <option>Rear Vehicle</option>
+              <option>Unknown</option>
+            </select>
+          </label>
+          <label>Vehicle B Role
+            <select id="vehicleBRole">
+              <option>Rear Vehicle</option>
+              <option>Front Vehicle</option>
+              <option>Unknown</option>
+            </select>
+          </label>
+          <label>Location
+            <input id="location" placeholder="Detected road/location" />
+          </label>
+        </div>
+        <button id="applyEditsBtn" class="secondary wide">Apply Edits to Statement Lightly</button>
+      </section>
+
+      <section class="card">
+        <h2>Diagram Preview</h2>
+        <div class="road">
+          <div class="lane-line"></div>
+          <div id="frontCar" class="car car-front">A</div>
+          <div id="rearCar" class="car car-rear">B</div>
+          <div class="impact">⚠</div>
+        </div>
+        <p id="diagramCaption" class="caption">Diagram will update after analysis.</p>
+      </section>
+    </section>
+
+    <section class="card">
+      <h2>Result</h2>
+      <pre id="result">No analysis yet.</pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
