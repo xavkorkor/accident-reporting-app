@@ -3,32 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AUA Accident Reporting System</title>
+  <title>Accident Sketch Generator - 2 Page Output</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <header class="app-header">
-    <div><p>AUA Accident Reporting System</p><h1>Accident Report + Diagram Generator</h1></div>
-    <div class="header-actions"><button id="exportPdfBtn">Export Final PDF</button><button id="clearBtn" class="secondary">Clear</button></div>
-  </header>
-  <main class="layout">
-    <section class="left-panel">
-      <div class="card"><h2>Reporting Statement</h2><textarea id="statement" rows="12" placeholder="Paste the reporting statement here"></textarea><div class="actions"><button id="analyzeBtn">Generate Diagram</button><button id="loadSampleBtn" class="secondary">Load Sample</button></div></div>
-      <div class="card"><h2>Extracted Details</h2><p class="muted">Editable. The statement and diagram will change according to your corrections.</p><div class="form-grid"><label>Accident Type<select id="accidentType"><option>Rear-End</option><option>Lane Change</option><option>Side Swipe</option><option>Head-On</option><option>Parking / Stationary</option><option>Unclear / Manual Review</option></select></label><label>Location<input id="location" placeholder="along / at / on" /></label><label>Vehicle A<select id="vehicleARole"><option>Front Vehicle</option><option>Rear Vehicle</option><option>Unknown</option></select></label><label>Vehicle B<select id="vehicleBRole"><option>Rear Vehicle</option><option>Front Vehicle</option><option>Unknown</option></select></label><label>Impact A<select id="impactA"><option>Rear</option><option>Front</option><option>Unknown</option></select></label><label>Impact B<select id="impactB"><option>Front</option><option>Rear</option><option>Unknown</option></select></label><label>Manual Review<select id="manualReview"><option>No</option><option>Yes</option></select></label><label>Review Reason<input id="reviewReason" /></label></div><button id="applyEditsBtn" class="wide secondary">Apply Manual Correction</button></div>
-      <div class="card"><h2>Original PDF / Image</h2><p class="muted">Upload the original accident report PDF or screenshot. It will be shown in the export area.</p><input type="file" id="sourceFile" accept="application/pdf,image/*" /><div id="sourcePreview" class="source-preview">No original file uploaded.</div></div>
-    </section>
-    <section class="right-panel">
-      <div id="exportArea" class="report-sheet">
-        <div class="sheet-title"><h2>ACCIDENT REPORT</h2><span id="sheetStatus">Draft</span></div>
-        <section class="sheet-block"><h3>Reporting Statement</h3><p id="reportingStatementOut">No statement generated yet.</p></section>
-        <section class="sheet-block"><h3>Diagram</h3><div class="diagram"><div class="road-lines"></div><div id="frontCar" class="vehicle front">A</div><div id="rearCar" class="vehicle rear">B</div><div class="hitmark">×</div></div><p id="diagramCaption">Diagram not generated.</p><div class="diagram-buttons no-print"><button id="swapRolesBtn" class="secondary">Swap A/B</button><button id="setAFrontBtn" class="secondary">A Front / B Rear</button><button id="setARearBtn" class="secondary">A Rear / B Front</button></div></section>
-        <section class="sheet-block"><h3>Extracted Details</h3><table><tbody id="detailsTable"></tbody></table></section>
-        <section class="sheet-block"><h3>Original PDF / Image</h3><div id="originalOut" class="original-box">Original PDF/image preview will appear here.</div></section>
+  <main class="app">
+    <aside class="left">
+      <section>
+        <h2>1. ACCIDENT STATEMENT</h2>
+        <textarea id="statement" maxlength="20000" rows="13"></textarea>
+        <div id="counter" class="counter">0 / 20000</div>
+        <button id="generateBtn" class="primary">✎  Generate 2-Page Report</button>
+      </section>
+      <section>
+        <h2>2. EXTRACTED DETAILS</h2>
+        <div id="details" class="details"></div>
+        <button id="applyBtn" class="purple">Apply Edited Details to Diagram + Statement</button>
+      </section>
+      <section>
+        <h2>3. ORIGINAL PDF / IMAGE</h2>
+        <p class="hint">Upload the original report PDF or screenshot/image. The export includes the original section, sketch plan and statement.</p>
+        <input id="originalFile" type="file" accept="application/pdf,image/*" />
+        <div id="originalPreview" class="original-preview">No original file uploaded.</div>
+      </section>
+      <section>
+        <h2>4. EXPORT</h2>
+        <button id="exportAllBtn" class="green">Export Final Report PDF</button>
+        <button id="exportPage1Btn" class="white">Export Page 1 Diagram PNG</button>
+        <button id="exportPage2Btn" class="white">Export Page 2 Statement PNG</button>
+      </section>
+    </aside>
+    <section class="right">
+      <h2 class="preview-title">OUTPUT PREVIEW</h2>
+      <div class="preview-grid">
+        <div><h3>Page 0 - Original PDF / Image</h3><div id="page0" class="page original-page"><div class="empty">Original PDF / Image preview</div></div></div>
+        <div><h3>Page 1 - Sketch Diagram</h3><div id="page1" class="page sketch-page"><div class="template-title">SKETCH PLAN</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div><div class="template-footer">Sketch diagram generated from accident statement</div></div></div>
+        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page"><div class="template-title">STATEMENT</div><div id="statementLayer" class="statement-layer"></div></div></div>
       </div>
-      <div class="card"><h2>Rear-End Stress Test</h2><button id="runTestsBtn" class="secondary">Run Tests</button><div id="testResults"></div></div>
     </section>
   </main>
-  <script src="app.js?v=10"></script>
+  <div id="exportBundle" class="export-bundle"></div>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
