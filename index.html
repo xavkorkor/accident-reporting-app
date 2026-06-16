@@ -3,29 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accident Reporting App</title>
+  <title>AUA Accident Reporting App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app-shell">
     <section class="hero">
       <p class="eyebrow">AUA Accident Reporting</p>
-      <h1>Accident Statement Analyzer</h1>
-      <p class="subtitle">Paste a driver statement, extract key accident details, classify the accident type, and generate a simple diagram preview.</p>
+      <h1>Accident Report Builder</h1>
+      <p class="subtitle">Analyze driver statements, extract only crucial details, edit the diagram/roles manually, and lightly update the statement without over-rewriting it.</p>
+      <div class="status-strip">
+        <span>Rear-end logic v8</span>
+        <span>Editable details</span>
+        <span>Manual review boundary</span>
+        <span>GitHub online build</span>
+      </div>
     </section>
 
     <section class="card">
-      <label for="statement">Driver Statement</label>
-      <textarea id="statement" rows="10" placeholder="Example: I was travelling along PIE when the vehicle behind hit the rear of my car after traffic slowed down."></textarea>
+      <div class="section-head">
+        <div>
+          <h2>1. Original Driver Statement</h2>
+          <p>Paste the raw statement here. The app will only use crucial facts for diagram and role detection.</p>
+        </div>
+        <button id="loadSampleBtn" class="secondary">Load Rear-End Sample</button>
+      </div>
+      <textarea id="statement" rows="9" placeholder="Example: I was travelling along PIE when traffic slowed and the vehicle behind contacted the rear of my vehicle."></textarea>
       <div class="actions">
         <button id="analyzeBtn">Analyze Statement</button>
         <button id="clearBtn" class="secondary">Clear</button>
       </div>
     </section>
 
-    <section class="grid">
+    <section class="grid two">
       <section class="card">
-        <h2>Extracted Details</h2>
+        <h2>2. Extracted Details</h2>
+        <p class="muted">These fields are editable. Accident code, direction, lane changing, stationary and confidence were removed as requested.</p>
         <div class="form-grid">
           <label>Accident Type
             <select id="accidentType">
@@ -51,31 +64,70 @@
               <option>Unknown</option>
             </select>
           </label>
-          <label>Location
-            <input id="location" placeholder="Detected road/location" />
+          <label>Detected Location
+            <input id="location" placeholder="along / at / on location" />
+          </label>
+          <label>Damage / Impact Point
+            <select id="impactPoint">
+              <option>Rear of Vehicle A</option>
+              <option>Front of Vehicle A</option>
+              <option>Rear of Vehicle B</option>
+              <option>Front of Vehicle B</option>
+              <option>Unknown</option>
+            </select>
+          </label>
+          <label>Manual Review
+            <select id="manualReview">
+              <option>No</option>
+              <option>Yes</option>
+            </select>
           </label>
         </div>
-        <button id="applyEditsBtn" class="secondary wide">Apply Edits to Statement Lightly</button>
+        <button id="applyEditsBtn" class="secondary wide">Apply Manual Edits Lightly to Statement</button>
       </section>
 
       <section class="card">
-        <h2>Diagram Preview</h2>
+        <h2>3. Diagram Preview</h2>
         <div class="road">
           <div class="lane-line"></div>
+          <div class="direction-arrow">Traffic Flow ↑</div>
           <div id="frontCar" class="car car-front">A</div>
           <div id="rearCar" class="car car-rear">B</div>
           <div class="impact">⚠</div>
         </div>
-        <p id="diagramCaption" class="caption">Diagram will update after analysis.</p>
+        <p id="diagramCaption" class="caption">Diagram updates when the extracted details are changed.</p>
+        <div class="diagram-actions">
+          <button id="swapRolesBtn" class="secondary">Swap A/B Roles</button>
+          <button id="markManualBtn" class="secondary">Mark Manual Review</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="grid two">
+      <section class="card">
+        <h2>4. Lightly Corrected Statement</h2>
+        <p class="muted">Manual edits add a short correction note instead of rewriting the whole statement.</p>
+        <textarea id="correctedStatement" rows="8" placeholder="Corrected statement will appear here."></textarea>
+      </section>
+
+      <section class="card">
+        <h2>5. Analysis Result</h2>
+        <pre id="result">No analysis yet.</pre>
       </section>
     </section>
 
     <section class="card">
-      <h2>Result</h2>
-      <pre id="result">No analysis yet.</pre>
+      <div class="section-head">
+        <div>
+          <h2>Rear-End Stress Tests</h2>
+          <p>Use these to test ambiguous rear-end statements without opening the browser console.</p>
+        </div>
+        <button id="runTestsBtn" class="secondary">Run Built-In Tests</button>
+      </div>
+      <div id="testResults" class="test-results">No tests run yet.</div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
