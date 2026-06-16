@@ -8,28 +8,6 @@ const captionEl = document.getElementById('diagramCaption');
 const frontCarEl = document.getElementById('frontCar');
 const rearCarEl = document.getElementById('rearCar');
 
-const REAR_END_PATTERNS = [
-  /hit\s+(the\s+)?rear\s+of\s+(my|our)\s+(car|vehicle)/i,
-  /knocked\s+(into|onto)\s+(the\s+)?back\s+of\s+(my|our)\s+(car|vehicle)/i,
-  /(vehicle|car)\s+behind\s+(me\s+)?(hit|collided|knocked|bumped)/i,
-  /(i|we)\s+(hit|collided|knocked|bumped)\s+(into\s+)?(the\s+)?rear\s+of/i,
-  /(front\s+vehicle|vehicle\s+in\s+front).*(braked|stopped|slowed)/i
-];
-
-const CHAIN_HINTS = [
-  /chain\s+collision/i,
-  /multiple\s+vehicles/i,
-  /pushed\s+(me|my|our)\s+(car|vehicle)\s+(into|onto)/i,
-  /hit\s+from\s+behind.*hit\s+(the\s+)?(front|vehicle\s+in\s+front)/i,
-  /vehicle\s+(behind|at\s+the\s+back).*pushed.*vehicle\s+(in\s+front|ahead)/i
-];
-
-const LOCATION_PATTERNS = [
-  /\balong\s+([^,.]+(?:road|rd|street|st|avenue|ave|expressway|way|lane|ln|drive|dr|pie|cte|sle|tpe|aye|kpe|bke|eCP)?)/i,
-  /\bat\s+([^,.]+(?:junction|exit|entrance|carpark|car\s+park|traffic\s+light|road|rd|street|st|avenue|ave))/i,
-  /\bon\s+([^,.]+(?:road|rd|street|st|avenue|ave|expressway|way|lane|ln|drive|dr|pie|cte|sle|tpe|aye|kpe|bke|ecp))/i
-];
-
 const TEST_CASES = [
   'I slowed down for traffic and the vehicle behind contacted the rear of my vehicle.',
   'While moving along PIE, I felt an impact at the back after the car in front slowed.',
@@ -43,71 +21,78 @@ const TEST_CASES = [
   'I accidentally knocked into the rear of the car in front when traffic came to a stop.'
 ];
 
-function hasMatch(text, patterns) {
-  return patterns.some(pattern => pattern.test(text));
+function normalize(text) {
+  return String(text || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function countVehicleReferences(text) {
-  const refs = text.match(/\b(vehicle|car|lorry|van|taxi|bus|motorcycle|bike)\b/gi) || [];
-  const ordinals = text.match(/\b(first|second|third|fourth|front|middle|rear|behind|ahead)\b/gi) || [];
-  return refs.length + ordinals.length;
+function hasAny(text, words) {
+  return words.some(word => text.includes(word));
 }
 
-function shouldManualReview(text) {
-  const chain = hasMatch(text, CHAIN_HINTS);
-  const vehicleRefs = countVehicleReferences(text);
-  // Boundary requested: do not treat a simple 2-party rear-end as chain collision.
-  return chain && vehicleRefs > 6;
+function shouldManualReview(raw) {
+  const text = normalize(raw);
+  const explicitChain = hasAny(text, ['chain collision', 'multiple vehicles', 'multi vehicle']);
+  const pushedIntoFront = /pushed .* into .* (front|ahead|vehicle in front|car in front)/.test(text);
+  const threeParty = /(third|3rd|three vehicles|vehicle c|car c)/.test(text);
+  return explicitChain || pushedIntoFront || threeParty;
 }
 
-function extractLocation(text) {
-  const cleaned = text.replace(/\b(?:on|at)\s+\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/gi, '');
-  for (const pattern of LOCATION_PATTERNS) {
-    const match = cleaned.match(pattern);
-    if (match && match[1]) return match[1].trim();
+function extractLocation(raw) {
+  const text = String(raw || '').replace(/\b(?:on|at)\s+\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/gi, '');
+  const patterns = [
+    /\balong\s+([^,.]+)/i,
+    /\bat\s+([^,.]+)/i,
+    /\bon\s+([^,.]+)/i
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const candidate = match[1].trim().replace(/\s+(when|while|and|after|before).*$/i, '').trim();
+    if (candidate && !/^\d/.test(candidate)) return candidate;
   }
   return '';
 }
 
-function analyzeStatement(text) {
-  const lower = text.toLowerCase();
-  const rearEnd = hasMatch(text, REAR_END_PATTERNS);
-  const manualReview = shouldManualReview(text);
-  let accidentType = rearEnd ? 'Rear-End' : 'Unclear / Manual Review';
-  let vehicleARole = 'Unknown';
-  let vehicleBRole = 'Unknown';
-  let reason = [];
+function analyzeStatement(raw) {
+  const original = String(raw || '').trim();
+  const text = normalize(original);
+  const reason = [];
 
-  if (manualReview) {
-    accidentType = 'Unclear / Manual Review';
-    reason.push('Potential chain-collision wording with more than two-party indicators.');
-  } else if (rearEnd) {
-    reason.push('Rear-end wording detected.');
-    if (/\b(i|we|my|our)\b.*\b(hit|collided|knocked|bumped)\b.*\brear\b/i.test(text) || /could not avoid contact with its rear/i.test(text)) {
-      vehicleARole = 'Rear Vehicle';
-      vehicleBRole = 'Front Vehicle';
-      reason.push('Statement suggests reporting vehicle hit the rear of the vehicle in front.');
-    } else if (/(hit|impact|knocked|bumped|collided).*(back|rear)\s+of\s+(my|our)/i.test(text) || /vehicle\s+behind\s+(me\s+)?(hit|collided|knocked|bumped|failed)/i.test(text)) {
-      vehicleARole = 'Front Vehicle';
-      vehicleBRole = 'Rear Vehicle';
-      reason.push('Statement suggests reporting vehicle was hit from behind.');
-    } else if (lower.includes('behind') && lower.includes('rear')) {
-      vehicleARole = 'Front Vehicle';
-      vehicleBRole = 'Rear Vehicle';
-      reason.push('Ambiguous rear-end wording, defaulting to reporting vehicle as front vehicle.');
-    }
-  } else {
-    reason.push('No strong rear-end pattern detected.');
+  if (!text) {
+    return { accidentType: 'Unclear / Manual Review', vehicleARole: 'Unknown', vehicleBRole: 'Unknown', location: '', manualReview: true, reason: ['Empty statement.'] };
   }
 
-  return {
-    accidentType,
-    vehicleARole,
-    vehicleBRole,
-    location: extractLocation(text),
-    manualReview,
-    reason
-  };
+  if (shouldManualReview(original)) {
+    return { accidentType: 'Unclear / Manual Review', vehicleARole: 'Unknown', vehicleBRole: 'Unknown', location: extractLocation(original), manualReview: true, reason: ['Possible chain or multi-vehicle wording detected.'] };
+  }
+
+  const rearWords = hasAny(text, ['rear', 'back', 'behind', 'bumper', 'from behind']);
+  const impactWords = hasAny(text, ['hit', 'contacted', 'contact', 'collided', 'collision', 'knocked', 'bumped', 'impact', 'touched', 'failed to stop']);
+  const frontVehicleWords = hasAny(text, ['front vehicle', 'vehicle in front', 'car in front', 'car ahead', 'vehicle ahead', 'its rear', 'rear bumper']);
+  const myRearWords = /(rear|back) of (my|our) (vehicle|car)/.test(text) || /(my|our) (rear|back)/.test(text) || /collided with my rear/.test(text);
+  const behindVehicleWords = /(vehicle|car) behind( me)?/.test(text) || /following vehicle/.test(text) || /from behind/.test(text);
+  const iHitFront = /(i|we) .*?(hit|contacted|collided|knocked|bumped|touched) .*?(rear|back|rear bumper|vehicle in front|car in front|front vehicle|its rear)/.test(text) || /could not avoid contact with its rear/.test(text) || /my front bumper touched its rear/.test(text);
+  const gotHitBehind = behindVehicleWords || myRearWords || /felt an impact at the back/.test(text) || /bump to the back of my vehicle/.test(text) || /hit from the rear/.test(text);
+  const rearEnd = (rearWords && impactWords) || iHitFront || gotHitBehind || (frontVehicleWords && impactWords);
+
+  if (!rearEnd) {
+    return { accidentType: 'Unclear / Manual Review', vehicleARole: 'Unknown', vehicleBRole: 'Unknown', location: extractLocation(original), manualReview: true, reason: ['No reliable rear-end pattern detected.'] };
+  }
+
+  reason.push('Rear-end pattern detected.');
+
+  if (iHitFront) {
+    reason.push('Reporting vehicle appears to be the rear vehicle that contacted the vehicle in front.');
+    return { accidentType: 'Rear-End', vehicleARole: 'Rear Vehicle', vehicleBRole: 'Front Vehicle', location: extractLocation(original), manualReview: false, reason };
+  }
+
+  if (gotHitBehind) {
+    reason.push('Reporting vehicle appears to be the front vehicle that was hit from behind.');
+    return { accidentType: 'Rear-End', vehicleARole: 'Front Vehicle', vehicleBRole: 'Rear Vehicle', location: extractLocation(original), manualReview: false, reason };
+  }
+
+  reason.push('Rear-end detected but role is ambiguous; defaulting to reporting vehicle as front vehicle for two-party rear-end wording.');
+  return { accidentType: 'Rear-End', vehicleARole: 'Front Vehicle', vehicleBRole: 'Rear Vehicle', location: extractLocation(original), manualReview: false, reason };
 }
 
 function updateFields(analysis) {
@@ -139,14 +124,14 @@ function lightlyRewriteStatement() {
   if (aRole !== 'Unknown') additions.push(`Vehicle A is recorded as the ${aRole.toLowerCase()}.`);
   if (loc && !text.toLowerCase().includes(loc.toLowerCase())) additions.push(`Location noted: ${loc}.`);
 
-  if (additions.length) {
-    text = `${text.replace(/\s+$/g, '')}\n\nCorrection note: ${additions.join(' ')}`;
-  }
+  if (additions.length) text = `${text.replace(/\s+$/g, '')}\n\nCorrection note: ${additions.join(' ')}`;
   statementEl.value = text;
 }
 
 function runTests() {
-  return TEST_CASES.map(statement => ({ statement, ...analyzeStatement(statement) }));
+  const rows = TEST_CASES.map(statement => ({ statement, ...analyzeStatement(statement) }));
+  console.table(rows);
+  return rows;
 }
 
 document.getElementById('analyzeBtn').addEventListener('click', () => {
