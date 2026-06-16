@@ -23,7 +23,7 @@
       </section>
       <section>
         <h2>3. ORIGINAL PDF / IMAGE</h2>
-        <p class="hint">Upload the original report PDF or screenshot/image. The export includes the original section, sketch plan and statement.</p>
+        <p class="hint">Upload the original accident PDF/image. It will be included as Page 0.</p>
         <input id="originalFile" type="file" accept="application/pdf,image/*" />
         <div id="originalPreview" class="original-preview">No original file uploaded.</div>
       </section>
@@ -44,13 +44,13 @@
       <h2 class="preview-title">OUTPUT PREVIEW</h2>
       <div class="preview-grid">
         <div><h3>Page 0 - Original PDF / Image</h3><div id="page0" class="page original-page"><div class="empty">Original PDF / Image preview</div></div></div>
-        <div><h3>Page 1 - Sketch Diagram</h3><div id="page1" class="page sketch-page"><div class="template-title">SKETCH PLAN</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div><div class="template-footer">Sketch diagram generated from accident statement</div></div></div>
-        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page"><div class="template-title">STATEMENT</div><div id="statementLayer" class="statement-layer"></div></div></div>
+        <div><h3>Page 1 - Sketch Plan</h3><div id="page1" class="page sketch-page official-page"><div class="official-head">SKETCH PLAN</div><div class="notice-box">IMPORTANT NOTICE<br><span>Official sketch plan form preview. Diagram is placed in the sketch area below.</span></div><div class="sign-row">Policyholder's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Actual Driver's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Witnessed by Reporting Centre Personnel</div><div class="sketch-title">Sketch Plan</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div></div></div>
+        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page official-page"><div class="page-num">vJun2022&nbsp;&nbsp;2</div><div class="circumstance-title">Describe Circumstance of the Accident</div><div id="statementLayer" class="statement-layer"></div><div class="declaration">Declaration<br>I/We declare the foregoing particulars are true in every respect.</div><div class="sign-row bottom">Policyholder's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Actual Driver's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Witnessed by Reporting Centre Personnel</div></div></div>
       </div>
     </section>
   </main>
   <div id="exportBundle" class="export-bundle"></div>
-  <script src="v7-logic.js?v=1"></script>
-  <script src="app.js?v=13"></script>
+  <script src="v7-logic.js?v=2"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
