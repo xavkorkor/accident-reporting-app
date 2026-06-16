@@ -3,131 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AUA Accident Reporting App</title>
+  <title>AUA Accident Reporting System</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app-shell">
+  <main class="app-shell pro">
     <section class="hero">
       <p class="eyebrow">AUA Accident Reporting</p>
-      <h1>Accident Report Builder</h1>
-      <p class="subtitle">Analyze driver statements, extract only crucial details, edit the diagram/roles manually, and lightly update the statement without over-rewriting it.</p>
+      <h1>Accident Reporting System</h1>
+      <p class="subtitle">A fuller online workflow for statement intake, extracted details, diagram correction, light statement correction, and rear-end stress testing.</p>
       <div class="status-strip">
-        <span>Rear-end logic v8</span>
-        <span>Editable details</span>
-        <span>Manual review boundary</span>
-        <span>GitHub online build</span>
+        <span>Statement intake</span><span>Editable extraction</span><span>Diagram correction</span><span>Rear-end test mode</span>
       </div>
     </section>
 
-    <section class="card">
+    <section class="card xl">
       <div class="section-head">
-        <div>
-          <h2>1. Original Driver Statement</h2>
-          <p>Paste the raw statement here. The app will only use crucial facts for diagram and role detection.</p>
-        </div>
-        <button id="loadSampleBtn" class="secondary">Load Rear-End Sample</button>
+        <div><h2>1. Statement Intake</h2><p>Paste the raw driver statement. The app extracts only crucial details.</p></div>
+        <button id="loadSampleBtn" class="secondary">Load Sample</button>
       </div>
-      <textarea id="statement" rows="9" placeholder="Example: I was travelling along PIE when traffic slowed and the vehicle behind contacted the rear of my vehicle."></textarea>
-      <div class="actions">
-        <button id="analyzeBtn">Analyze Statement</button>
-        <button id="clearBtn" class="secondary">Clear</button>
+      <textarea id="statement" rows="12" placeholder="Paste accident statement here..."></textarea>
+      <div class="actions"><button id="analyzeBtn">Analyze & Build Report</button><button id="clearBtn" class="secondary">Clear</button></div>
+    </section>
+
+    <section class="card xl">
+      <div class="section-head"><div><h2>2. Editable Extracted Details</h2><p class="muted">Removed fields: accident code, direction, lane changing, stationary and confidence.</p></div><button id="syncFromFieldsBtn" class="secondary">Sync All</button></div>
+      <div class="form-grid big">
+        <label>Accident Type<select id="accidentType"><option>Rear-End</option><option>Lane Change</option><option>Side Swipe</option><option>Head-On</option><option>Parking / Stationary</option><option>Unclear / Manual Review</option></select></label>
+        <label>Manual Review<select id="manualReview"><option>No</option><option>Yes</option></select></label>
+        <label>Location<input id="location" placeholder="Detected from along / at / on" /></label>
+        <label>Road Context<input id="roadContext" placeholder="junction / traffic light / expressway" /></label>
+        <label>Vehicle A Role<select id="vehicleARole"><option>Front Vehicle</option><option>Rear Vehicle</option><option>Changing Lane Vehicle</option><option>Stationary Vehicle</option><option>Unknown</option></select></label>
+        <label>Vehicle B Role<select id="vehicleBRole"><option>Rear Vehicle</option><option>Front Vehicle</option><option>Changing Lane Vehicle</option><option>Stationary Vehicle</option><option>Unknown</option></select></label>
+        <label>Vehicle A Action<input id="vehicleAAction" placeholder="slowed / stopped / was contacted" /></label>
+        <label>Vehicle B Action<input id="vehicleBAction" placeholder="failed to stop / contacted rear" /></label>
+        <label>Impact Point A<select id="impactA"><option>Rear</option><option>Front</option><option>Left Side</option><option>Right Side</option><option>Unknown</option></select></label>
+        <label>Impact Point B<select id="impactB"><option>Front</option><option>Rear</option><option>Left Side</option><option>Right Side</option><option>Unknown</option></select></label>
+        <label>Number of Vehicles<select id="vehicleCount"><option>2</option><option>3+</option><option>Unknown</option></select></label>
+        <label>Review Reason<input id="reviewReason" placeholder="Only when manual review is needed" /></label>
       </div>
     </section>
 
     <section class="grid two">
-      <section class="card">
-        <h2>2. Extracted Details</h2>
-        <p class="muted">These fields are editable. Accident code, direction, lane changing, stationary and confidence were removed as requested.</p>
-        <div class="form-grid">
-          <label>Accident Type
-            <select id="accidentType">
-              <option>Rear-End</option>
-              <option>Lane Change</option>
-              <option>Side Swipe</option>
-              <option>Head-On</option>
-              <option>Parking / Stationary</option>
-              <option>Unclear / Manual Review</option>
-            </select>
-          </label>
-          <label>Vehicle A Role
-            <select id="vehicleARole">
-              <option>Front Vehicle</option>
-              <option>Rear Vehicle</option>
-              <option>Unknown</option>
-            </select>
-          </label>
-          <label>Vehicle B Role
-            <select id="vehicleBRole">
-              <option>Rear Vehicle</option>
-              <option>Front Vehicle</option>
-              <option>Unknown</option>
-            </select>
-          </label>
-          <label>Detected Location
-            <input id="location" placeholder="along / at / on location" />
-          </label>
-          <label>Damage / Impact Point
-            <select id="impactPoint">
-              <option>Rear of Vehicle A</option>
-              <option>Front of Vehicle A</option>
-              <option>Rear of Vehicle B</option>
-              <option>Front of Vehicle B</option>
-              <option>Unknown</option>
-            </select>
-          </label>
-          <label>Manual Review
-            <select id="manualReview">
-              <option>No</option>
-              <option>Yes</option>
-            </select>
-          </label>
-        </div>
-        <button id="applyEditsBtn" class="secondary wide">Apply Manual Edits Lightly to Statement</button>
-      </section>
-
-      <section class="card">
-        <h2>3. Diagram Preview</h2>
-        <div class="road">
-          <div class="lane-line"></div>
-          <div class="direction-arrow">Traffic Flow ↑</div>
-          <div id="frontCar" class="car car-front">A</div>
-          <div id="rearCar" class="car car-rear">B</div>
-          <div class="impact">⚠</div>
-        </div>
-        <p id="diagramCaption" class="caption">Diagram updates when the extracted details are changed.</p>
-        <div class="diagram-actions">
-          <button id="swapRolesBtn" class="secondary">Swap A/B Roles</button>
-          <button id="markManualBtn" class="secondary">Mark Manual Review</button>
-        </div>
-      </section>
+      <section class="card"><h2>3. Diagram Controls</h2><p class="muted">Correct the diagram manually when extraction is wrong.</p><div class="button-stack"><button id="swapRolesBtn" class="secondary">Swap A/B Roles</button><button id="rearEndAFrontBtn" class="secondary">Set A Front / B Rear</button><button id="rearEndARearBtn" class="secondary">Set A Rear / B Front</button><button id="markManualBtn" class="danger">Mark Manual Review</button></div></section>
+      <section class="card"><h2>Diagram Preview</h2><div class="road"><div class="lane-line"></div><div class="direction-arrow">Traffic Flow ↑</div><div id="frontCar" class="car car-front">A</div><div id="rearCar" class="car car-rear">B</div><div class="impact">⚠</div></div><p id="diagramCaption" class="caption">Diagram updates when fields change.</p></section>
     </section>
 
     <section class="grid two">
-      <section class="card">
-        <h2>4. Lightly Corrected Statement</h2>
-        <p class="muted">Manual edits add a short correction note instead of rewriting the whole statement.</p>
-        <textarea id="correctedStatement" rows="8" placeholder="Corrected statement will appear here."></textarea>
-      </section>
-
-      <section class="card">
-        <h2>5. Analysis Result</h2>
-        <pre id="result">No analysis yet.</pre>
-      </section>
+      <section class="card"><h2>4. Light Corrected Statement</h2><p class="muted">Keeps original wording and adds only a short correction note.</p><textarea id="correctedStatement" rows="10" placeholder="Corrected statement appears here..."></textarea><button id="applyEditsBtn" class="wide">Generate Light Correction</button></section>
+      <section class="card"><h2>5. Final Structured Report</h2><pre id="result">No report yet.</pre><button id="copyReportBtn" class="secondary wide">Copy Report</button></section>
     </section>
 
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>Rear-End Stress Tests</h2>
-          <p>Use these to test ambiguous rear-end statements without opening the browser console.</p>
-        </div>
-        <button id="runTestsBtn" class="secondary">Run Built-In Tests</button>
-      </div>
-      <div id="testResults" class="test-results">No tests run yet.</div>
-    </section>
+    <section class="card xl"><div class="section-head"><div><h2>Rear-End Stress Tests</h2><p class="muted">Visible test mode for ambiguous rear-end statements.</p></div><button id="runTestsBtn" class="secondary">Run Built-In Tests</button></div><div id="testResults" class="test-results">No tests run yet.</div></section>
   </main>
-
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
