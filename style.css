@@ -1,0 +1,163 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #172033;
+  background: #eef2f7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.hero {
+  padding: 28px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #111827, #334155);
+  color: white;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: 12px;
+  opacity: .8;
+  margin: 0 0 8px;
+}
+
+h1, h2 { margin-top: 0; }
+
+.subtitle {
+  max-width: 760px;
+  line-height: 1.6;
+  opacity: .9;
+}
+
+.card {
+  background: white;
+  border: 1px solid #d9e1ef;
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
+  margin-bottom: 20px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+textarea, input, select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  background: #f8fafc;
+}
+
+textarea { resize: vertical; }
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+}
+
+button.secondary {
+  background: #e2e8f0;
+  color: #172033;
+}
+
+button.wide { margin-top: 16px; width: 100%; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.road {
+  position: relative;
+  height: 260px;
+  border-radius: 22px;
+  background: #475569;
+  overflow: hidden;
+  border: 8px solid #94a3b8;
+}
+
+.lane-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 100%;
+  border-left: 5px dashed rgba(255,255,255,.7);
+}
+
+.car {
+  position: absolute;
+  left: calc(50% - 38px);
+  width: 76px;
+  height: 48px;
+  border-radius: 14px 14px 10px 10px;
+  background: #f8fafc;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  box-shadow: 0 10px 20px rgba(0,0,0,.25);
+}
+
+.car-front { top: 58px; }
+.car-rear { bottom: 58px; }
+
+.impact {
+  position: absolute;
+  left: calc(50% - 15px);
+  top: calc(50% - 15px);
+  font-size: 30px;
+}
+
+.caption {
+  margin-bottom: 0;
+  color: #475569;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 18px;
+  border-radius: 16px;
+  overflow: auto;
+}
+
+@media (max-width: 820px) {
+  .grid, .form-grid { grid-template-columns: 1fr; }
+  .app-shell { width: min(100% - 20px, 1120px); padding: 20px 0; }
+}
