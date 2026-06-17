@@ -32,50 +32,90 @@
 
   function drawSedan(ctx, lab, x, y, taxi) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 5, 0, 48, 82, 18); ctx.fill(); ctx.stroke();
-    ctx.lineWidth = 3; rr(ctx, 12, 10, 34, 20, 7); ctx.stroke(); rr(ctx, 12, 52, 34, 20, 7); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(8, 36); ctx.lineTo(50, 36); ctx.moveTo(8, 46); ctx.lineTo(50, 46); ctx.stroke();
-    ctx.beginPath(); ctx.arc(10, 18, 3, 0, Math.PI * 2); ctx.arc(48, 18, 3, 0, Math.PI * 2); ctx.arc(10, 65, 3, 0, Math.PI * 2); ctx.arc(48, 65, 3, 0, Math.PI * 2); ctx.fill();
-    if (taxi) { ctx.strokeRect(18, 34, 22, 12); ctx.font = 'bold 7px Arial'; ctx.fillText('TAXI', 20, 43); }
-    label(ctx, lab, 21, 50, 24); ctx.restore();
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.bezierCurveTo(50, 6, 58, 24, 58, 43);
+    ctx.bezierCurveTo(58, 64, 50, 80, 30, 86);
+    ctx.bezierCurveTo(10, 80, 2, 64, 2, 43);
+    ctx.bezierCurveTo(2, 24, 10, 6, 30, 0);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.ellipse(30, 17, 19, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(30, 69, 19, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(11, 32); ctx.lineTo(49, 32); ctx.moveTo(11, 54); ctx.lineTo(49, 54); ctx.stroke();
+    if (taxi) {
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 2.5;
+      ctx.strokeRect(18, 37, 24, 13);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 7px Arial'; ctx.fillText('TAXI', 20, 46);
+      ctx.font = 'bold 20px Arial'; ctx.fillText(lab, 24, 64);
+    } else {
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 23, 48);
+    }
+    ctx.restore();
   }
 
   function drawVan(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 3, 0, 54, 86, 8); ctx.fill(); ctx.stroke();
-    ctx.lineWidth = 3; rr(ctx, 12, 9, 36, 18, 4); ctx.stroke(); rr(ctx, 12, 34, 36, 38, 4); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(12, 53); ctx.lineTo(48, 53); ctx.stroke();
-    label(ctx, lab, 22, 57, 24); ctx.font = 'bold 8px Arial'; ctx.fillText('VAN', 20, 96); ctx.restore();
+    rr(ctx, 4, 0, 54, 90, 9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.fillRect(13, 9, 36, 15);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+    ctx.strokeRect(13, 34, 36, 40);
+    ctx.beginPath(); ctx.moveTo(13, 48); ctx.lineTo(49, 48); ctx.moveTo(13, 62); ctx.lineTo(49, 62); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 24, 59);
+    ctx.restore();
   }
 
   function drawTruck(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 6, 0, 48, 28, 6); ctx.fill(); ctx.stroke(); ctx.strokeRect(2, 32, 56, 58);
-    ctx.lineWidth = 3; ctx.strokeRect(13, 8, 32, 12); ctx.beginPath(); ctx.moveTo(12, 45); ctx.lineTo(48, 45); ctx.moveTo(12, 62); ctx.lineTo(48, 62); ctx.stroke();
-    label(ctx, lab, 22, 72, 24); ctx.font = 'bold 8px Arial'; ctx.fillText('TRUCK', 13, 101); ctx.restore();
+    rr(ctx, 8, 0, 44, 28, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.fillRect(17, 8, 26, 11);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 4.5;
+    ctx.strokeRect(2, 34, 56, 62);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(12, 49); ctx.lineTo(48, 49);
+    ctx.moveTo(12, 66); ctx.lineTo(48, 66);
+    ctx.moveTo(12, 83); ctx.lineTo(48, 83);
+    ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 23, 75);
+    ctx.restore();
   }
 
   function drawBus(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 0, 0, 62, 92, 8); ctx.fill(); ctx.stroke();
-    ctx.lineWidth = 2.8; ctx.strokeRect(10, 8, 42, 12); ctx.strokeRect(10, 72, 42, 12);
-    for (let i = 0; i < 4; i++) { ctx.strokeRect(8, 26 + i * 10, 12, 6); ctx.strokeRect(42, 26 + i * 10, 12, 6); }
-    label(ctx, lab, 24, 58, 24); ctx.font = 'bold 8px Arial'; ctx.fillText('BUS', 23, 103); ctx.restore();
+    rr(ctx, 0, 0, 62, 96, 9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.fillRect(10, 8, 42, 13);
+    ctx.fillRect(10, 75, 42, 13);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.6;
+    for (let i = 0; i < 5; i++) {
+      ctx.strokeRect(8, 27 + i * 9, 12, 5);
+      ctx.strokeRect(42, 27 + i * 9, 12, 5);
+    }
+    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 24, 57);
+    ctx.restore();
   }
 
   function drawMotorcycle(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.lineWidth = 4.8;
-    ctx.beginPath(); ctx.ellipse(30, 8, 13, 8, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(30, 76, 13, 8, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = 4.5;
+    ctx.beginPath(); ctx.ellipse(30, 7, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(30, 78, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
     ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.ellipse(30, 31, 14, 11, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(30, 54, 12, 16, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.lineWidth = 4.2;
-    ctx.beginPath(); ctx.moveTo(30, 17); ctx.lineTo(30, 23); ctx.moveTo(30, 42); ctx.lineTo(30, 47); ctx.moveTo(30, 67); ctx.lineTo(30, 70); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(13, 24); ctx.lineTo(47, 24); ctx.moveTo(17, 42); ctx.lineTo(43, 42); ctx.moveTo(19, 61); ctx.lineTo(41, 61); ctx.stroke();
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 18px Arial'; ctx.fillText(lab, 24, 59);
-    ctx.fillStyle = '#111'; ctx.font = 'bold 8px Arial'; ctx.fillText('M/CYCLE', 7, 96); ctx.restore();
+    ctx.beginPath(); ctx.ellipse(30, 30, 13, 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(30, 55, 11, 15, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(30, 15); ctx.lineTo(30, 22);
+    ctx.moveTo(30, 40); ctx.lineTo(30, 47);
+    ctx.moveTo(30, 68); ctx.lineTo(30, 72);
+    ctx.moveTo(13, 24); ctx.lineTo(47, 24);
+    ctx.moveTo(17, 45); ctx.lineTo(43, 45);
+    ctx.moveTo(19, 63); ctx.lineTo(41, 63);
+    ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = 'bold 18px Arial'; ctx.fillText(lab, 24, 60);
+    ctx.restore();
   }
 
   function drawVehicle(ctx, lab, type, x, y, scale = 1) {
