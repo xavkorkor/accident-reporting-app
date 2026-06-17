@@ -4,8 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accident Sketch Generator - Sketch Plan & Statement</title>
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
   <main class="app">
@@ -36,13 +37,40 @@
     </aside>
     <section class="right">
       <div class="preview-grid">
-        <div><h3>Page 1 - Sketch Plan</h3><div id="page1" class="page sketch-page official-page"><div class="official-head">SKETCH PLAN</div><div class="notice-box">1. Please report <u>correctly</u> the details of the accident to speed up the claims process.<br>2. This Form must be <u>completed</u> by the Policyholder and/or the Actual Driver.<br>3. Information provided must be as <u>truthful and accurate as possible</u>. Any wilful misrepresentation or withholding of material facts may allow insurance companies to <u>repudiate policy liability</u>.<br>4. The issue and acceptance of this Form by insurance companies is not an admission of policy liability on the part of the insurance companies.<br>5. <b><u>Any false reporting may be referred to the Traffic Police Department for investigation.</u></b><br>6. This report will be forwarded by the insurers to the GIA Records Management Centre established by the General Insurance Association of Singapore (GIA) for archiving.<br>7. By the lodgement of this report to the insurers, you consent to the archiving of this report and copies being made available aforesaid.<br>8. <b>Consent under the Personal Data Protection Act (PDPA)</b><br>I understand, acknowledge, agree and consent that my insurer, my workshop and GIA may collect, use, disclose and process my personal data for processing, handling, investigating and administering my claims.</div><div class="sign-row"><span>Policyholder's Signature / Date & Time</span><span>Actual Driver's Signature (if driver is not the policyholder) / Date & Time</span><span>Witnessed by Reporting Centre Personnel<br>(Name as in NRIC/ID card)</span></div><div class="sketch-title">Sketch Plan</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div><div class="page-num">vJun2022&nbsp;&nbsp;1</div></div></div>
-        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page official-page"><div class="circumstance-title">Describe Circumstance of the Accident</div><div id="statementLayer" class="statement-layer"></div><div class="declaration">Declaration<br>I/We declare the foregoing particulars are true in every respect.</div><div class="sign-row bottom"><span>Policyholder's Signature / Date & Time</span><span>Actual Driver's Signature (if driver is not the policyholder) / Date & Time</span><span>Witnessed by Reporting Centre Personnel<br>(Name as in NRIC/ID card)</span></div><div class="page-num">vJun2022&nbsp;&nbsp;2</div></div></div>
+        <div><h3>Page 1 - Sketch Plan</h3><div id="page1" class="page sketch-page official-page actual-form"><canvas id="formPage1" class="form-bg"></canvas><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div></div></div>
+        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page official-page actual-form"><canvas id="formPage2" class="form-bg"></canvas><div id="statementLayer" class="statement-layer"></div></div></div>
       </div>
     </section>
   </main>
   <div id="exportBundle" class="export-bundle"></div>
   <script src="v7-logic.js?v=2"></script>
   <script src="app.js?v=17"></script>
+  <script>
+    window.addEventListener('load', function () {
+      if (!window.pdfjsLib) return;
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      window.pdfjsLib.getDocument('sketch-plan.pdf').promise.then(function (pdf) {
+        function renderFormPage(pageNo, canvasId) {
+          return pdf.getPage(pageNo).then(function (page) {
+            var canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            var viewport = page.getViewport({ scale: 2 });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            return page.render({ canvasContext: ctx, viewport: viewport }).promise;
+          });
+        }
+        renderFormPage(1, 'formPage1');
+        renderFormPage(2, 'formPage2');
+      }).catch(function () {
+        document.querySelectorAll('.actual-form').forEach(function (page) {
+          page.classList.add('missing-form');
+        });
+      });
+    });
+  </script>
 </body>
 </html>
