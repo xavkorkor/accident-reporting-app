@@ -12,8 +12,6 @@ const accidentTypes = [
   'Manual Review'
 ];
 
-// User-facing extracted details only. Removed accident code, direction, stationary,
-// confidence, lane-changing, manual-review and review-reason from the editable panel.
 const fieldList = [
   ['date', 'Date:', 'input'],
   ['time', 'Time:', 'input'],
@@ -42,13 +40,10 @@ function initFields() {
   fieldList.forEach(([key, label, type]) => {
     const row = document.createElement('div');
     row.className = 'detail-row';
-
     const lab = document.createElement('label');
     lab.textContent = label;
-
     const input = type === 'select' ? document.createElement('select') : document.createElement('input');
     input.id = 'f_' + key;
-
     if (type === 'select') {
       accidentTypes.forEach(value => {
         const option = document.createElement('option');
@@ -57,7 +52,6 @@ function initFields() {
         input.appendChild(option);
       });
     }
-
     input.addEventListener('input', renderAll);
     input.addEventListener('change', renderAll);
     row.append(lab, input);
@@ -131,7 +125,6 @@ function plateFor(label, d) {
 function renderDiagram(d) {
   const c = byId('diagramCanvas'), ctx = c.getContext('2d');
   const n = laneCount(d), roadLeft = 170, roadTop = 60, roadW = 420, roadH = 640, laneW = roadW / n;
-
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, c.width, c.height);
@@ -140,7 +133,6 @@ function renderDiagram(d) {
   ctx.strokeStyle = '#111';
   ctx.lineWidth = 2;
   ctx.strokeRect(roadLeft, roadTop, roadW, roadH);
-
   ctx.strokeStyle = '#777';
   ctx.lineWidth = 3;
   for (let i = 1; i < n; i++) {
@@ -152,20 +144,17 @@ function renderDiagram(d) {
     ctx.stroke();
   }
   ctx.setLineDash([]);
-
   ctx.fillStyle = '#111';
   ctx.font = 'bold 24px Arial';
   ctx.fillText('Traffic Flow ↑', 35, 45);
   ctx.font = '16px Arial';
   ctx.fillText(n + ' lanes - ' + (d.lane_position || 'centre') + ' lane', 35, 72);
   if (d.road_feature) ctx.fillText(String(d.road_feature).replace('_', ' '), 35, 96);
-
   const x = laneX(d);
   const front = d.front_vehicle || 'A';
   const rear = d.rear_vehicle || 'B';
   drawVehicle(ctx, front, vehicleTypeForLabel(front, d), plateFor(front, d), x, 145, 'FRONT');
   drawVehicle(ctx, rear, vehicleTypeForLabel(rear, d), plateFor(rear, d), x, 430, 'REAR');
-
   ctx.fillStyle = '#d93025';
   ctx.font = 'bold 74px Arial';
   ctx.fillText('X', x + 32, 392);
@@ -259,8 +248,6 @@ function replaceFirst(source, regex, replacement) {
 function applyEditedDetailsToStatement(d) {
   let s = text();
   const old = lastGeneratedData || {};
-
-  // Only make small factual substitutions. Do not rewrite the whole statement.
   if (d.date && d.date !== old.date) s = replaceFirst(s, /\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/, d.date);
   if (d.time && d.time !== old.time) s = replaceFirst(s, /(?:about\s*)?\d{3,4}\s*hrs/i, 'about ' + d.time.replace(/\s*hrs$/i, '') + 'hrs');
   if (d.road && d.road !== old.road) {
@@ -276,7 +263,6 @@ function applyEditedDetailsToStatement(d) {
   if (d.lane_position && d.lane_position !== old.lane_position) {
     s = replaceFirst(s, /\b(left|right|middle|centre|center)\s+lane\b/i, d.lane_position + ' lane');
   }
-
   byId('statement').value = s;
   updateCounter();
   lastGeneratedData = { ...d };
@@ -286,29 +272,17 @@ function updateCounter() {
   byId('counter').textContent = text().length + ' / 20000';
 }
 
-function previewOriginal(file) {
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  if (file.type.startsWith('image/')) {
-    byId('page0').innerHTML = '<img src="' + url + '">';
-    byId('originalPreview').innerHTML = '<img src="' + url + '">';
-  } else {
-    byId('page0').innerHTML = '<embed src="' + url + '" type="application/pdf"><div class="pdf-note">Original PDF uploaded: ' + esc(file.name) + '</div>';
-    byId('originalPreview').innerHTML = '<embed src="' + url + '" type="application/pdf"><div class="pdf-note">' + esc(file.name) + '</div>';
-  }
-}
-
 function exportPdf() {
   const bundle = byId('exportBundle');
   bundle.innerHTML = '';
-  ['page0', 'page1', 'page2'].forEach(id => {
+  ['page1', 'page2'].forEach(id => {
     const clone = byId(id).cloneNode(true);
     clone.classList.add('export-page');
     bundle.appendChild(clone);
   });
   html2pdf().set({
     margin: 6,
-    filename: 'accident-report-with-original.pdf',
+    filename: 'sketch-plan-and-statement.pdf',
     html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   }).from(bundle).save();
@@ -332,7 +306,6 @@ setData(analyze(SAMPLE));
 byId('statement').addEventListener('input', updateCounter);
 byId('generateBtn').onclick = () => setData(analyze(text()));
 byId('applyBtn').onclick = () => { applyEditedDetailsToStatement(getData()); renderAll(); };
-byId('originalFile').onchange = e => previewOriginal(e.target.files[0]);
 byId('exportAllBtn').onclick = exportPdf;
 byId('exportPage1Btn').onclick = () => { const a = document.createElement('a'); a.download = 'page1-sketch-diagram.png'; a.href = byId('diagramCanvas').toDataURL('image/png'); a.click(); };
 byId('exportPage2Btn').onclick = () => html2pdf().set({ filename: 'page2-statement.pdf' }).from(byId('page2')).save();
