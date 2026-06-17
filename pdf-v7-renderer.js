@@ -22,99 +22,136 @@
   }
 
   function rr(ctx, x, y, w, h, r) {
-    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
     ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
     ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
     ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
   }
 
-  function label(ctx, txt, x, y, size) { ctx.fillStyle = '#111'; ctx.font = 'bold ' + size + 'px Arial'; ctx.fillText(txt, x, y); }
+  function centerText(ctx, txt, x, y, size, fill, stroke) {
+    ctx.save();
+    ctx.font = 'bold ' + size + 'px Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (stroke) { ctx.lineWidth = 3; ctx.strokeStyle = stroke; ctx.strokeText(txt, x, y); }
+    ctx.fillStyle = fill || '#111'; ctx.fillText(txt, x, y);
+    ctx.restore();
+  }
+
+  function setupIcon(ctx) {
+    ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 3.2;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  }
 
   function drawSedan(ctx, lab, x, y, taxi) {
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
+    ctx.save(); ctx.translate(x, y); setupIcon(ctx);
+    // outer silhouette with bonnet/boot taper, closer to the reference car icon
     ctx.beginPath();
-    ctx.moveTo(30, 0);
-    ctx.bezierCurveTo(50, 6, 58, 24, 58, 43);
-    ctx.bezierCurveTo(58, 64, 50, 80, 30, 86);
-    ctx.bezierCurveTo(10, 80, 2, 64, 2, 43);
-    ctx.bezierCurveTo(2, 24, 10, 6, 30, 0);
+    ctx.moveTo(30, 1);
+    ctx.bezierCurveTo(45, 3, 54, 13, 56, 31);
+    ctx.bezierCurveTo(58, 46, 57, 63, 54, 75);
+    ctx.bezierCurveTo(50, 86, 40, 91, 30, 92);
+    ctx.bezierCurveTo(20, 91, 10, 86, 6, 75);
+    ctx.bezierCurveTo(3, 63, 2, 46, 4, 31);
+    ctx.bezierCurveTo(6, 13, 15, 3, 30, 1);
     ctx.closePath(); ctx.fill(); ctx.stroke();
+    // mirrors
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(2, 39, 5, 3, -0.4, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(58, 39, 5, 3, 0.4, 0, Math.PI * 2); ctx.stroke();
+    // windows and roof details
     ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.ellipse(30, 17, 19, 8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(30, 69, 19, 8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(11, 32); ctx.lineTo(49, 32); ctx.moveTo(11, 54); ctx.lineTo(49, 54); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(30, 21, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(30, 70, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(13, 33); ctx.bezierCurveTo(17, 29, 43, 29, 47, 33);
+    ctx.moveTo(13, 59); ctx.bezierCurveTo(17, 63, 43, 63, 47, 59);
+    ctx.moveTo(11, 39); ctx.lineTo(11, 58);
+    ctx.moveTo(49, 39); ctx.lineTo(49, 58);
+    ctx.stroke();
+    // side black strips / wheel areas
+    ctx.fillStyle = '#111';
+    ctx.fillRect(8, 43, 5, 20); ctx.fillRect(47, 43, 5, 20);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(18, 7); ctx.lineTo(42, 7); ctx.moveTo(17, 86); ctx.lineTo(43, 86); ctx.stroke();
     if (taxi) {
-      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 2.5;
-      ctx.strokeRect(18, 37, 24, 13);
-      ctx.fillStyle = '#111'; ctx.font = 'bold 7px Arial'; ctx.fillText('TAXI', 20, 46);
-      ctx.font = 'bold 20px Arial'; ctx.fillText(lab, 24, 64);
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 2.3;
+      ctx.strokeRect(18, 39, 24, 14);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 7px Arial'; ctx.textAlign = 'center'; ctx.fillText('TAXI', 30, 49);
+      centerText(ctx, lab, 30, 62, 18, '#111');
     } else {
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 23, 48);
+      centerText(ctx, lab, 30, 48, 20, '#fff', '#111');
     }
     ctx.restore();
   }
 
   function drawVan(ctx, lab, x, y) {
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 4, 0, 54, 90, 9); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.fillRect(13, 9, 36, 15);
-    ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
-    ctx.strokeRect(13, 34, 36, 40);
-    ctx.beginPath(); ctx.moveTo(13, 48); ctx.lineTo(49, 48); ctx.moveTo(13, 62); ctx.lineTo(49, 62); ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 24, 59);
+    ctx.save(); ctx.translate(x, y); setupIcon(ctx);
+    rr(ctx, 2, 0, 60, 96, 8); ctx.fill(); ctx.stroke();
+    // front windscreen
+    ctx.fillStyle = '#111'; ctx.fillRect(12, 9, 40, 16);
+    // cargo roof ribs
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.2;
+    rr(ctx, 12, 34, 40, 42, 4); ctx.stroke();
+    for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.moveTo(17, 41 + i * 7); ctx.lineTo(47, 41 + i * 7); ctx.stroke(); }
+    // side details
+    ctx.beginPath(); ctx.moveTo(8, 29); ctx.lineTo(8, 80); ctx.moveTo(56, 29); ctx.lineTo(56, 80); ctx.stroke();
+    centerText(ctx, lab, 32, 83, 18, '#111');
     ctx.restore();
   }
 
   function drawTruck(ctx, lab, x, y) {
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 8, 0, 44, 28, 7); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.fillRect(17, 8, 26, 11);
-    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 4.5;
-    ctx.strokeRect(2, 34, 56, 62);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(12, 49); ctx.lineTo(48, 49);
-    ctx.moveTo(12, 66); ctx.lineTo(48, 66);
-    ctx.moveTo(12, 83); ctx.lineTo(48, 83);
-    ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 23, 75);
+    ctx.save(); ctx.translate(x, y); setupIcon(ctx);
+    // cab
+    rr(ctx, 8, 0, 44, 31, 6); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.fillRect(16, 9, 28, 11);
+    // joint and cargo body
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3.2;
+    ctx.strokeRect(4, 38, 56, 62);
+    ctx.strokeRect(9, 44, 46, 50);
+    // cargo panel lines
+    ctx.lineWidth = 2.1;
+    for (let yy of [55, 70, 85]) { ctx.beginPath(); ctx.moveTo(14, yy); ctx.lineTo(50, yy); ctx.stroke(); }
+    // wheels
+    ctx.fillStyle = '#111'; ctx.fillRect(2, 13, 4, 11); ctx.fillRect(54, 13, 4, 11); ctx.fillRect(2, 54, 4, 16); ctx.fillRect(54, 54, 4, 16);
+    centerText(ctx, lab, 32, 77, 18, '#111');
     ctx.restore();
   }
 
   function drawBus(ctx, lab, x, y) {
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 0, 0, 62, 96, 9); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#111';
-    ctx.fillRect(10, 8, 42, 13);
-    ctx.fillRect(10, 75, 42, 13);
-    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.6;
+    ctx.save(); ctx.translate(x, y); setupIcon(ctx);
+    rr(ctx, 0, 0, 66, 100, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.fillRect(10, 8, 46, 13); ctx.fillRect(10, 79, 46, 13);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.3;
+    // side window slots
     for (let i = 0; i < 5; i++) {
-      ctx.strokeRect(8, 27 + i * 9, 12, 5);
-      ctx.strokeRect(42, 27 + i * 9, 12, 5);
+      ctx.strokeRect(9, 28 + i * 9, 12, 5);
+      ctx.strokeRect(45, 28 + i * 9, 12, 5);
     }
-    ctx.fillStyle = '#111'; ctx.font = 'bold 22px Arial'; ctx.fillText(lab, 24, 57);
+    // roof long panel and small door mark
+    ctx.strokeRect(24, 31, 18, 42); ctx.fillStyle = '#111'; ctx.fillRect(51, 48, 4, 9);
+    centerText(ctx, lab, 33, 62, 18, '#111');
     ctx.restore();
   }
 
   function drawMotorcycle(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.lineWidth = 4.5;
-    ctx.beginPath(); ctx.ellipse(30, 7, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(30, 78, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.ellipse(30, 30, 13, 10, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#111'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.ellipse(30, 55, 11, 15, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(30, 15); ctx.lineTo(30, 22);
-    ctx.moveTo(30, 40); ctx.lineTo(30, 47);
-    ctx.moveTo(30, 68); ctx.lineTo(30, 72);
-    ctx.moveTo(13, 24); ctx.lineTo(47, 24);
-    ctx.moveTo(17, 45); ctx.lineTo(43, 45);
-    ctx.moveTo(19, 63); ctx.lineTo(41, 63);
-    ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.font = 'bold 18px Arial'; ctx.fillText(lab, 24, 60);
+    ctx.lineWidth = 3.2;
+    // wheels
+    ctx.beginPath(); ctx.ellipse(30, 6, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(30, 82, 13, 7, 0, 0, Math.PI * 2); ctx.stroke();
+    // front fork, handlebar
+    ctx.beginPath(); ctx.moveTo(30, 13); ctx.lineTo(30, 22); ctx.moveTo(14, 24); ctx.lineTo(46, 24); ctx.stroke();
+    // tank and body
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(30, 34, 13, 11, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.beginPath(); ctx.ellipse(30, 57, 11, 16, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(30, 45); ctx.lineTo(30, 49); ctx.moveTo(30, 73); ctx.lineTo(30, 77); ctx.stroke();
+    // foot rests / handle details
+    ctx.beginPath(); ctx.moveTo(17, 48); ctx.lineTo(43, 48); ctx.moveTo(19, 66); ctx.lineTo(41, 66); ctx.stroke();
+    centerText(ctx, lab, 30, 57, 15, '#fff');
     ctx.restore();
   }
 
