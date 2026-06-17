@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accident Sketch Generator - 3 Page Output</title>
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
@@ -24,7 +24,7 @@
       </section>
       <section>
         <h2>3. ORIGINAL PDF / IMAGE</h2>
-        <p class="hint">Upload the original accident PDF/image. The first PDF page or uploaded image will be rendered as Page 0 and included in export.</p>
+        <p class="hint">Upload the original accident PDF/image. It will be included as Page 0.</p>
         <input id="originalFile" type="file" accept="application/pdf,image/*" />
         <div id="originalPreview" class="original-preview">No original file uploaded.</div>
       </section>
@@ -45,8 +45,8 @@
       <h2 class="preview-title">OUTPUT PREVIEW</h2>
       <div class="preview-grid">
         <div><h3>Page 0 - Original PDF / Image</h3><div id="page0" class="page original-page"><div class="empty">Original PDF / Image preview</div></div></div>
-        <div><h3>Page 1 - Sketch Plan</h3><div id="page1" class="page sketch-page official-page"><div class="official-head">SKETCH PLAN</div><div class="notice-box">IMPORTANT NOTICE<br><span>Official sketch plan form preview. Diagram is placed in the sketch area below.</span></div><div class="sign-row">Policyholder's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Actual Driver's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Witnessed by Reporting Centre Personnel</div><div class="sketch-title">Sketch Plan</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div></div></div>
-        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page official-page"><div class="page-num">vJun2022&nbsp;&nbsp;2</div><div class="circumstance-title">Describe Circumstance of the Accident</div><div id="statementLayer" class="statement-layer"></div><div class="declaration">Declaration<br>I/We declare the foregoing particulars are true in every respect.</div><div class="sign-row bottom">Policyholder's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Actual Driver's Signature / Date & Time&nbsp;&nbsp;&nbsp;&nbsp; Witnessed by Reporting Centre Personnel</div></div></div>
+        <div><h3>Page 1 - Sketch Plan</h3><div id="page1" class="page sketch-page official-page"><div class="official-head">SKETCH PLAN</div><div class="notice-box">1. Please report <u>correctly</u> the details of the accident to speed up the claims process.<br>2. This Form must be <u>completed</u> by the Policyholder and/or the Actual Driver.<br>3. Information provided must be as <u>truthful and accurate as possible</u>. Any wilful misrepresentation or withholding of material facts may allow insurance companies to <u>repudiate policy liability</u>.<br>4. The issue and acceptance of this Form by insurance companies is not an admission of policy liability on the part of the insurance companies.<br>5. <b><u>Any false reporting may be referred to the Traffic Police Department for investigation.</u></b><br>6. This report will be forwarded by the insurers to the GIA Records Management Centre established by the General Insurance Association of Singapore (GIA) for archiving.<br>7. By the lodgement of this report to the insurers, you consent to the archiving of this report and copies being made available aforesaid.<br>8. <b>Consent under the Personal Data Protection Act (PDPA)</b><br>I understand, acknowledge, agree and consent that my insurer, my workshop and GIA may collect, use, disclose and process my personal data for processing, handling, investigating and administering my claims.</div><div class="sign-row"><span>Policyholder's Signature / Date & Time</span><span>Actual Driver's Signature (if driver is not the policyholder) / Date & Time</span><span>Witnessed by Reporting Centre Personnel<br>(Name as in NRIC/ID card)</span></div><div class="sketch-title">Sketch Plan</div><div class="diagram-box"><canvas id="diagramCanvas" width="760" height="760"></canvas></div><div class="page-num">vJun2022&nbsp;&nbsp;1</div></div></div>
+        <div><h3>Page 2 - Statement</h3><div id="page2" class="page statement-page official-page"><div class="circumstance-title">Describe Circumstance of the Accident</div><div id="statementLayer" class="statement-layer"></div><div class="declaration">Declaration<br>I/We declare the foregoing particulars are true in every respect.</div><div class="sign-row bottom"><span>Policyholder's Signature / Date & Time</span><span>Actual Driver's Signature (if driver is not the policyholder) / Date & Time</span><span>Witnessed by Reporting Centre Personnel<br>(Name as in NRIC/ID card)</span></div><div class="page-num">vJun2022&nbsp;&nbsp;2</div></div></div>
       </div>
     </section>
   </main>
