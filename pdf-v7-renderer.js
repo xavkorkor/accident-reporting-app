@@ -33,9 +33,7 @@
   function drawSedan(ctx, lab, x, y, taxi) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
     rr(ctx, 5, 0, 48, 82, 18); ctx.fill(); ctx.stroke();
-    ctx.lineWidth = 3;
-    rr(ctx, 12, 10, 34, 20, 7); ctx.stroke();
-    rr(ctx, 12, 52, 34, 20, 7); ctx.stroke();
+    ctx.lineWidth = 3; rr(ctx, 12, 10, 34, 20, 7); ctx.stroke(); rr(ctx, 12, 52, 34, 20, 7); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(8, 36); ctx.lineTo(50, 36); ctx.moveTo(8, 46); ctx.lineTo(50, 46); ctx.stroke();
     ctx.beginPath(); ctx.arc(10, 18, 3, 0, Math.PI * 2); ctx.arc(48, 18, 3, 0, Math.PI * 2); ctx.arc(10, 65, 3, 0, Math.PI * 2); ctx.arc(48, 65, 3, 0, Math.PI * 2); ctx.fill();
     if (taxi) { ctx.strokeRect(18, 34, 22, 12); ctx.font = 'bold 7px Arial'; ctx.fillText('TAXI', 20, 43); }
@@ -52,8 +50,7 @@
 
   function drawTruck(ctx, lab, x, y) {
     ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 4.5;
-    rr(ctx, 6, 0, 48, 28, 6); ctx.fill(); ctx.stroke();
-    ctx.strokeRect(2, 32, 56, 58);
+    rr(ctx, 6, 0, 48, 28, 6); ctx.fill(); ctx.stroke(); ctx.strokeRect(2, 32, 56, 58);
     ctx.lineWidth = 3; ctx.strokeRect(13, 8, 32, 12); ctx.beginPath(); ctx.moveTo(12, 45); ctx.lineTo(48, 45); ctx.moveTo(12, 62); ctx.lineTo(48, 62); ctx.stroke();
     label(ctx, lab, 22, 72, 24); ctx.font = 'bold 8px Arial'; ctx.fillText('TRUCK', 13, 101); ctx.restore();
   }
@@ -67,12 +64,18 @@
   }
 
   function drawMotorcycle(ctx, lab, x, y) {
-    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#111'; ctx.lineWidth = 5.5;
-    ctx.beginPath(); ctx.ellipse(28, 10, 13, 9, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(28, 70, 13, 9, 0, 0, Math.PI * 2); ctx.stroke();
-    ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(28, 22); ctx.lineTo(28, 58); ctx.stroke();
-    ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(16, 35); ctx.lineTo(40, 35); ctx.moveTo(18, 50); ctx.lineTo(38, 50); ctx.stroke();
-    label(ctx, lab, 20, 49, 22); ctx.font = 'bold 8px Arial'; ctx.fillText('BIKE', 15, 91); ctx.restore();
+    ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.lineWidth = 4.8;
+    ctx.beginPath(); ctx.ellipse(30, 8, 13, 8, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(30, 76, 13, 8, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.ellipse(30, 31, 14, 11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(30, 54, 12, 16, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = 4.2;
+    ctx.beginPath(); ctx.moveTo(30, 17); ctx.lineTo(30, 23); ctx.moveTo(30, 42); ctx.lineTo(30, 47); ctx.moveTo(30, 67); ctx.lineTo(30, 70); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(13, 24); ctx.lineTo(47, 24); ctx.moveTo(17, 42); ctx.lineTo(43, 42); ctx.moveTo(19, 61); ctx.lineTo(41, 61); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 18px Arial'; ctx.fillText(lab, 24, 59);
+    ctx.fillStyle = '#111'; ctx.font = 'bold 8px Arial'; ctx.fillText('M/CYCLE', 7, 96); ctx.restore();
   }
 
   function drawVehicle(ctx, lab, type, x, y, scale = 1) {
@@ -108,12 +111,12 @@
   window.renderDiagram = function renderDiagram(d) {
     const c = byId('diagramCanvas'); if (!c) return; c.width = 1000; c.height = 320;
     const ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height);
-    const plan = lanePlan(d), n = plan.lanes, roadW = Math.min(300, n * 92), left = 455 - roadW / 2, top = 45, bottom = 245, laneW = roadW / n;
+    const plan = lanePlan(d), n = plan.lanes, roadW = Math.min(300, n * 92), left = 455 - roadW / 2, top = 12, bottom = 296, laneW = roadW / n;
     ctx.strokeStyle = '#111'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, bottom); ctx.stroke(); ctx.beginPath(); ctx.moveTo(left + roadW, top); ctx.lineTo(left + roadW, bottom); ctx.stroke();
-    ctx.strokeStyle = '#555'; ctx.lineWidth = 4; ctx.setLineDash([16, 16]); for (let i = 1; i < n; i++) { const lx = left + laneW * i; ctx.beginPath(); ctx.moveTo(lx, top); ctx.lineTo(lx, bottom); ctx.stroke(); } ctx.setLineDash([]);
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 4; ctx.setLineDash([18, 16]); for (let i = 1; i < n; i++) { const lx = left + laneW * i; ctx.beginPath(); ctx.moveTo(lx, top); ctx.lineTo(lx, bottom); ctx.stroke(); } ctx.setLineDash([]);
     const x = left + laneW * (plan.laneIndex + 0.5) - 29, front = d.front_vehicle || 'A', rear = d.rear_vehicle || 'B';
-    drawVehicle(ctx, front, vehicleType(front, d), x, 68); drawVehicle(ctx, rear, vehicleType(rear, d), x, 172);
-    ctx.fillStyle = '#111'; ctx.font = 'bold 34px Arial'; ctx.fillText('X', x + 14, 168); ctx.font = 'bold 44px Arial'; ctx.fillText('↑', left + roadW / 2 - 13, 296);
+    drawVehicle(ctx, front, vehicleType(front, d), x, 62); drawVehicle(ctx, rear, vehicleType(rear, d), x, 178);
+    ctx.fillStyle = '#111'; ctx.font = 'bold 34px Arial'; ctx.fillText('X', x + 14, 170); ctx.font = 'bold 44px Arial'; ctx.fillText('↑', left + roadW / 2 - 13, 316);
     drawLegend(ctx, d); drawLocation(ctx, d.road);
   };
 
