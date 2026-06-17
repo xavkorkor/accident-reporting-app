@@ -47,67 +47,51 @@
   <script src="app.js?v=17"></script>
   <script>
     function compactVehicle(ctx, label, plate, x, y) {
-      ctx.save();
-      ctx.strokeStyle = '#111';
-      ctx.fillStyle = '#fff';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
+      ctx.save(); ctx.strokeStyle = '#111'; ctx.fillStyle = '#fff'; ctx.lineWidth = 3;
       var r = 10, w = 52, h = 78;
-      ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+      ctx.beginPath(); ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
       ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
       ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-      ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
-      ctx.fill(); ctx.stroke();
-      ctx.strokeRect(x+11, y+9, 30, 11);
-      ctx.strokeRect(x+11, y+58, 30, 11);
-      ctx.fillStyle = '#111';
-      ctx.font = 'bold 24px Arial';
-      ctx.fillText(label, x+18, y+46);
-      ctx.font = '9px Arial';
-      if (plate) ctx.fillText(plate, x-5, y+h+14);
-      ctx.restore();
+      ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y); ctx.fill(); ctx.stroke();
+      ctx.strokeRect(x+11, y+9, 30, 11); ctx.strokeRect(x+11, y+58, 30, 11);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 24px Arial'; ctx.fillText(label, x+18, y+46);
+      ctx.font = '9px Arial'; if (plate) ctx.fillText(plate, x-5, y+h+14); ctx.restore();
+    }
+    function v7LanePlan(d) {
+      var p = String(d.lane_position || '').toLowerCase().trim();
+      var explicit = parseInt(d.road_lane_count, 10);
+      var mentionedLane = p.indexOf('left') >= 0 || p.indexOf('right') >= 0 || p.indexOf('middle') >= 0 || p.indexOf('centre') >= 0 || p.indexOf('center') >= 0;
+      var lanes = 1;
+      var laneIndex = 0;
+      if (p.indexOf('middle') >= 0 || p.indexOf('centre') >= 0 || p.indexOf('center') >= 0) { lanes = 3; laneIndex = 1; }
+      else if (p.indexOf('left') >= 0) { lanes = 2; laneIndex = 0; }
+      else if (p.indexOf('right') >= 0) { lanes = 2; laneIndex = 1; }
+      else if (explicit >= 2 && explicit <= 5 && mentionedLane) { lanes = explicit; laneIndex = Math.floor(lanes / 2); }
+      return { lanes: lanes, laneIndex: laneIndex, laneText: mentionedLane ? d.lane_position : '' };
     }
     renderDiagram = function (d) {
-      var c = document.getElementById('diagramCanvas');
-      if (!c) return;
+      var c = document.getElementById('diagramCanvas'); if (!c) return;
       c.width = 1000; c.height = 320;
-      var ctx = c.getContext('2d');
-      ctx.clearRect(0, 0, c.width, c.height);
-      var n = Math.max(1, Math.min(4, parseInt(d.road_lane_count || '1', 10) || 1));
-      var roadW = Math.min(360, n * 90);
-      var left = 470 - roadW / 2;
-      var top = 58;
-      var bottom = 260;
-      var laneW = roadW / n;
-      ctx.strokeStyle = '#111';
-      ctx.lineWidth = 2;
+      var ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height);
+      var plan = v7LanePlan(d);
+      var n = plan.lanes;
+      var roadW = Math.min(300, n * 92);
+      var left = 500 - roadW / 2;
+      var top = 62, bottom = 260, laneW = roadW / n;
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, bottom); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(left + roadW, top); ctx.lineTo(left + roadW, bottom); ctx.stroke();
-      ctx.strokeStyle = '#777';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([14, 18]);
-      for (var i = 1; i < n; i++) {
-        var lx = left + laneW * i;
-        ctx.beginPath(); ctx.moveTo(lx, top); ctx.lineTo(lx, bottom); ctx.stroke();
-      }
+      ctx.strokeStyle = '#777'; ctx.lineWidth = 2; ctx.setLineDash([14, 18]);
+      for (var i = 1; i < n; i++) { var lx = left + laneW * i; ctx.beginPath(); ctx.moveTo(lx, top); ctx.lineTo(lx, bottom); ctx.stroke(); }
       ctx.setLineDash([]);
-      var p = String(d.lane_position || '').toLowerCase();
-      var laneIndex = Math.floor(n / 2);
-      if (p.indexOf('left') >= 0) laneIndex = 0;
-      if (p.indexOf('right') >= 0) laneIndex = n - 1;
-      var x = left + laneW * (laneIndex + 0.5) - 26;
-      ctx.fillStyle = '#111';
-      ctx.font = 'bold 18px Arial';
-      ctx.fillText('Traffic Flow ↑', 40, 42);
+      var x = left + laneW * (plan.laneIndex + 0.5) - 26;
+      ctx.fillStyle = '#111'; ctx.font = 'bold 18px Arial'; ctx.fillText('Traffic Flow ↑', 40, 42);
       ctx.font = '13px Arial';
-      ctx.fillText(n + ' lane' + (n > 1 ? 's' : '') + (d.lane_position ? ' - ' + d.lane_position + ' lane' : ''), 40, 62);
-      var front = d.front_vehicle || 'A';
-      var rear = d.rear_vehicle || 'B';
+      ctx.fillText(n + ' lane' + (n > 1 ? 's' : '') + (plan.laneText ? ' - ' + plan.laneText + ' lane' : ''), 40, 62);
+      var front = d.front_vehicle || 'A', rear = d.rear_vehicle || 'B';
       compactVehicle(ctx, front, plateFor(front, d), x, 72);
       compactVehicle(ctx, rear, plateFor(rear, d), x, 178);
-      ctx.fillStyle = '#111';
-      ctx.font = 'bold 26px Arial';
-      ctx.fillText('X', x + 17, 170);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 26px Arial'; ctx.fillText('X', x + 17, 170);
     };
     window.addEventListener('load', function () {
       if (typeof renderAll === 'function') renderAll();
@@ -116,22 +100,14 @@
       window.pdfjsLib.getDocument('sketch-plan.pdf').promise.then(function (pdf) {
         function renderFormPage(pageNo, canvasId) {
           return pdf.getPage(pageNo).then(function (page) {
-            var canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            var viewport = page.getViewport({ scale: 2 });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            var ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            var canvas = document.getElementById(canvasId); if (!canvas) return;
+            var viewport = page.getViewport({ scale: 2 }); canvas.width = viewport.width; canvas.height = viewport.height;
+            var ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             return page.render({ canvasContext: ctx, viewport: viewport }).promise;
           });
         }
-        renderFormPage(1, 'formPage1');
-        renderFormPage(2, 'formPage2');
-      }).catch(function () {
-        document.querySelectorAll('.actual-form').forEach(function (page) { page.classList.add('missing-form'); });
-      });
+        renderFormPage(1, 'formPage1'); renderFormPage(2, 'formPage2');
+      }).catch(function () { document.querySelectorAll('.actual-form').forEach(function (page) { page.classList.add('missing-form'); }); });
     });
   </script>
 </body>
