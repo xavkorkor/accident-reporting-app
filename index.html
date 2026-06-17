@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accident Sketch Generator - Sketch Plan & Statement</title>
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
@@ -66,24 +66,38 @@
       if (explicit >= 2 && explicit <= 5) return { lanes: explicit, laneIndex: Math.floor(explicit / 2), laneText: '' };
       return { lanes: 1, laneIndex: 0, laneText: '' };
     }
-    function drawLegend(ctx, d, cx) {
+    function drawVehicleIcon(ctx, x, y, label) {
+      ctx.save(); ctx.strokeStyle = '#111'; ctx.lineWidth = 1.4; ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, 22, 34, 5) : ctx.rect(x, y, 22, 34); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#111'; ctx.font = 'bold 9px Arial'; ctx.fillText(label, x+7, y+21); ctx.restore();
+    }
+    function drawLegend(ctx, d) {
       var rows = [];
-      if (d.vehicle1_plate) rows.push('A - ' + d.vehicle1_plate + (d.vehicle1_model ? ' (' + d.vehicle1_model + ')' : ''));
-      if (d.vehicle2_plate) rows.push('B - ' + d.vehicle2_plate + (d.vehicle2_type ? ' (' + d.vehicle2_type + ')' : ''));
-      if (d.vehicle3_plate) rows.push('C - ' + d.vehicle3_plate + (d.vehicle3_type ? ' (' + d.vehicle3_type + ')' : ''));
-      if (!rows.length) rows.push('A / B - Vehicles');
+      if (d.vehicle1_plate) rows.push({label:'A', text:d.vehicle1_plate + (d.vehicle1_model ? '  ' + d.vehicle1_model : '')});
+      if (d.vehicle2_plate) rows.push({label:'B', text:d.vehicle2_plate + (d.vehicle2_type ? '  ' + d.vehicle2_type : '')});
+      if (d.vehicle3_plate) rows.push({label:'C', text:d.vehicle3_plate + (d.vehicle3_type ? '  ' + d.vehicle3_type : '')});
+      if (!rows.length) rows.push({label:'A/B', text:'Vehicles'});
       ctx.save();
-      ctx.font = 'bold 13px Arial';
-      var w = 0;
-      rows.forEach(function (r) { w = Math.max(w, ctx.measureText(r).width); });
-      w += 26;
-      var h = rows.length * 18 + 14;
-      var x = cx - w / 2, y = 136 - h / 2;
-      ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5;
-      ctx.fillRect(x, y, w, h); ctx.strokeRect(x, y, w, h);
-      ctx.fillStyle = '#111';
-      rows.forEach(function (r, i) { ctx.fillText(r, x + 12, y + 22 + i * 18); });
-      if (d.road) { ctx.font = '11px Arial'; ctx.fillText('Location: ' + d.road, 40, 302); }
+      var x = 720, y = 88, w = 210, h = rows.length * 45 + 58;
+      ctx.fillStyle = 'rgba(255,255,255,0.94)'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, 10) : ctx.rect(x, y, w, h); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#111'; ctx.font = 'bold 15px Arial'; ctx.fillText('LEGEND', x + 16, y + 26);
+      rows.forEach(function (r, i) {
+        var yy = y + 48 + i * 45;
+        drawVehicleIcon(ctx, x + 16, yy - 17, r.label);
+        ctx.font = 'bold 13px Arial'; ctx.fillText(r.label, x + 50, yy + 1);
+        ctx.font = '12px Arial'; ctx.fillText(r.text, x + 78, yy + 1);
+      });
+      var iy = y + 48 + rows.length * 45;
+      ctx.font = 'bold 22px Arial'; ctx.fillText('X', x + 20, iy + 4);
+      ctx.font = '12px Arial'; ctx.fillText('Point of Impact', x + 50, iy + 1);
+      ctx.restore();
+    }
+    function drawVerticalLocation(ctx, d) {
+      if (!d.road) return;
+      ctx.save(); ctx.translate(58, 210); ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 15px Arial';
+      ctx.fillText('Location: ' + d.road, 0, 0);
       ctx.restore();
     }
     renderDiagram = function (d) {
@@ -93,8 +107,8 @@
       var plan = v7LanePlan(d);
       var n = plan.lanes;
       var roadW = Math.min(300, n * 92);
-      var left = 500 - roadW / 2;
-      var top = 62, bottom = 260, laneW = roadW / n;
+      var left = 455 - roadW / 2;
+      var top = 45, bottom = 245, laneW = roadW / n;
       ctx.strokeStyle = '#111'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, bottom); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(left + roadW, top); ctx.lineTo(left + roadW, bottom); ctx.stroke();
@@ -102,13 +116,14 @@
       for (var i = 1; i < n; i++) { var lx = left + laneW * i; ctx.beginPath(); ctx.moveTo(lx, top); ctx.lineTo(lx, bottom); ctx.stroke(); }
       ctx.setLineDash([]);
       var x = left + laneW * (plan.laneIndex + 0.5) - 26;
-      ctx.fillStyle = '#111'; ctx.font = 'bold 18px Arial'; ctx.fillText('Traffic Flow ↑', 40, 42);
-      ctx.font = '13px Arial'; ctx.fillText(n + ' lane' + (n > 1 ? 's' : '') + (plan.laneText ? ' - ' + plan.laneText + ' lane' : ''), 40, 62);
+      ctx.fillStyle = '#111'; ctx.font = '13px Arial'; ctx.fillText(n + ' lane' + (n > 1 ? 's' : '') + (plan.laneText ? ' - ' + plan.laneText + ' lane' : ''), 130, 48);
       var front = d.front_vehicle || 'A', rear = d.rear_vehicle || 'B';
-      compactVehicle(ctx, front, plateFor(front, d), x, 72);
-      compactVehicle(ctx, rear, plateFor(rear, d), x, 178);
-      ctx.fillStyle = '#111'; ctx.font = 'bold 26px Arial'; ctx.fillText('X', x + 17, 170);
-      drawLegend(ctx, d, 500);
+      compactVehicle(ctx, front, plateFor(front, d), x, 70);
+      compactVehicle(ctx, rear, plateFor(rear, d), x, 174);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 26px Arial'; ctx.fillText('X', x + 17, 165);
+      ctx.font = 'bold 34px Arial'; ctx.fillText('↑', left + roadW / 2 - 10, 292);
+      drawLegend(ctx, d);
+      drawVerticalLocation(ctx, d);
     };
     window.addEventListener('load', function () {
       if (typeof renderAll === 'function') renderAll();
