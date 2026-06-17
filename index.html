@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accident Sketch Generator - 2 Page Output</title>
+  <title>Accident Sketch Generator - 3 Page Output</title>
   <link rel="stylesheet" href="style.css?v=2" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
   <main class="app">
@@ -14,7 +15,7 @@
         <h2>1. ACCIDENT STATEMENT</h2>
         <textarea id="statement" maxlength="20000" rows="13"></textarea>
         <div id="counter" class="counter">0 / 20000</div>
-        <button id="generateBtn" class="primary">✎  Generate 2-Page Report</button>
+        <button id="generateBtn" class="primary">✎  Generate 3-Page Report</button>
       </section>
       <section>
         <h2>2. EXTRACTED DETAILS</h2>
@@ -23,7 +24,7 @@
       </section>
       <section>
         <h2>3. ORIGINAL PDF / IMAGE</h2>
-        <p class="hint">Upload the original accident PDF/image. It will be included as Page 0.</p>
+        <p class="hint">Upload the original accident PDF/image. The first PDF page or uploaded image will be rendered as Page 0 and included in export.</p>
         <input id="originalFile" type="file" accept="application/pdf,image/*" />
         <div id="originalPreview" class="original-preview">No original file uploaded.</div>
       </section>
@@ -51,6 +52,6 @@
   </main>
   <div id="exportBundle" class="export-bundle"></div>
   <script src="v7-logic.js?v=2"></script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
 </body>
 </html>
