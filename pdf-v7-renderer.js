@@ -76,13 +76,17 @@
     ctx.font = '8px Arial'; ctx.fillText('BIKE', x + 14, y + 88); ctx.restore();
   }
 
-  function drawVehicle(ctx, label, type, x, y) {
+  function drawVehicle(ctx, label, type, x, y, scale = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
     const t = String(type || '').toLowerCase();
-    if (t.includes('motor') || t.includes('bike')) return drawMotorcycle(ctx, label, x, y);
-    if (t.includes('bus')) return drawBus(ctx, label, x - 3, y);
-    if (t.includes('lorry') || t.includes('truck') || t.includes('trailer') || t.includes('prime')) return drawTruck(ctx, label, x - 3, y);
-    if (t.includes('van')) return drawVan(ctx, label, x, y);
-    return drawCar(ctx, label, x, y, t.includes('taxi') ? 'TAXI' : '');
+    if (t.includes('motor') || t.includes('bike')) drawMotorcycle(ctx, label, 0, 0);
+    else if (t.includes('bus')) drawBus(ctx, label, -3, 0);
+    else if (t.includes('lorry') || t.includes('truck') || t.includes('trailer') || t.includes('prime')) drawTruck(ctx, label, -3, 0);
+    else if (t.includes('van')) drawVan(ctx, label, 0, 0);
+    else drawCar(ctx, label, 0, 0, t.includes('taxi') ? 'TAXI' : '');
+    ctx.restore();
   }
 
   function drawLocation(ctx, road) {
@@ -100,19 +104,19 @@
     if (d.vehicle3_plate) rows.push(['C', d.vehicle3_plate, d.vehicle3_type || 'Car']);
     if (!rows.length) rows.push(['A/B', 'Vehicles', '']);
     ctx.save();
-    const x = 720, y = 88, w = 210, h = rows.length * 45 + 58;
-    ctx.fillStyle = 'rgba(255,255,255,0.94)'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.8;
-    roundRect(ctx, x, y, w, h, 10); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#111'; ctx.font = 'bold 15px Arial'; ctx.fillText('LEGEND', x + 16, y + 26);
+    const x = 805, y = 120, w = 170, h = rows.length * 32 + 42;
+    ctx.fillStyle = 'rgba(255,255,255,0.96)'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.4;
+    roundRect(ctx, x, y, w, h, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = 'bold 12px Arial'; ctx.fillText('LEGEND', x + 10, y + 19);
     rows.forEach((r, i) => {
-      const yy = y + 48 + i * 45;
-      drawVehicle(ctx, r[0], r[2], x + 16, yy - 19);
-      ctx.fillStyle = '#111'; ctx.font = 'bold 13px Arial'; ctx.fillText(r[0], x + 50, yy + 1);
-      ctx.font = '12px Arial'; ctx.fillText((r[1] || '') + (r[2] ? '  ' + r[2] : ''), x + 78, yy + 1);
+      const yy = y + 38 + i * 32;
+      drawVehicle(ctx, r[0], r[2], x + 10, yy - 17, 0.36);
+      ctx.fillStyle = '#111'; ctx.font = 'bold 11px Arial'; ctx.fillText(r[0], x + 36, yy - 3);
+      ctx.font = '10px Arial'; ctx.fillText((r[1] || '') + (r[2] ? ' ' + r[2] : ''), x + 58, yy - 3);
     });
-    const iy = y + 48 + rows.length * 45;
-    ctx.font = 'bold 22px Arial'; ctx.fillText('X', x + 20, iy + 4);
-    ctx.font = '12px Arial'; ctx.fillText('Point of Impact', x + 50, iy + 1);
+    const iy = y + 38 + rows.length * 32;
+    ctx.font = 'bold 17px Arial'; ctx.fillText('X', x + 14, iy - 2);
+    ctx.font = '10px Arial'; ctx.fillText('Point of Impact', x + 36, iy - 4);
     ctx.restore();
   }
 
