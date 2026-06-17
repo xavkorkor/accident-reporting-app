@@ -53,5 +53,29 @@
   <div id="exportBundle" class="export-bundle"></div>
   <script src="v7-logic.js?v=2"></script>
   <script src="app.js?v=16"></script>
+  <script>
+    window.addEventListener('load', function () {
+      var input = document.getElementById('originalFile');
+      if (!input) return;
+      input.onchange = function (event) {
+        var file = event.target.files && event.target.files[0];
+        if (!file) return;
+        var page0 = document.getElementById('page0');
+        var preview = document.getElementById('originalPreview');
+        var reader = new FileReader();
+        reader.onload = function () {
+          if (file.type.indexOf('image/') === 0) {
+            var html = '<img src="' + reader.result + '"><div class="pdf-note">Original image uploaded: ' + file.name + '</div>';
+            page0.innerHTML = html;
+            preview.innerHTML = html;
+          } else {
+            page0.innerHTML = '<div class="empty">PDF uploaded: ' + file.name + '<br>Preview not rendered yet. Export will include this placeholder.</div>';
+            preview.innerHTML = 'PDF uploaded: ' + file.name;
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+    });
+  </script>
 </body>
 </html>
