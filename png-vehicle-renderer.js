@@ -10,7 +10,6 @@
   };
 
   const icons = {};
-  let loaded = false;
 
   function byId(id) { return document.getElementById(id); }
 
@@ -21,10 +20,7 @@
       const img = new Image();
       img.onload = img.onerror = function () {
         remaining -= 1;
-        if (remaining === 0) {
-          loaded = true;
-          if (typeof window.renderAll === 'function') window.renderAll();
-        }
+        if (remaining === 0 && typeof window.renderAll === 'function') window.renderAll();
       };
       img.src = ICON_PATHS[key];
       icons[key] = img;
@@ -111,17 +107,17 @@
       drawFallback(ctx, -boxW / 2, -boxH / 2, boxW, boxH);
     }
     ctx.restore();
-    drawLabel(ctx, label, x + w / 2, y + h * 0.53, Math.max(13, Math.min(23, w * 0.30)));
+    drawLabel(ctx, label, x + w / 2, y + h * 0.53, Math.max(13, Math.min(23, Math.min(w, h) * 0.34)));
   }
 
-  function drawLocation(ctx, road, roadLeft) {
+  function drawLocation(ctx, road, roadX, roadY, roadH) {
     if (!road) return;
     ctx.save();
-    ctx.translate(roadLeft - 12, 230);
-    ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = '#111';
     ctx.font = 'bold 17px Arial';
-    ctx.fillText('Location: ' + road, 0, 0);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Location: ' + road, roadX, roadY + roadH + 24);
     ctx.restore();
   }
 
@@ -134,7 +130,7 @@
 
     ctx.save();
     const x = 745;
-    const y = 82;
+    const y = 78;
     const w = 240;
     const rowH = 44;
     const h = rows.length * rowH + 72;
@@ -176,50 +172,51 @@
 
     const plan = lanePlan(d);
     const n = plan.lanes;
-    const roadW = Math.min(300, n * 92);
-    const left = 455 - roadW / 2;
-    const top = 0;
-    const bottom = 320;
-    const laneW = roadW / n;
+    const roadX = 150;
+    const roadY = 58;
+    const roadW = 560;
+    const roadH = Math.min(190, n * 58);
+    const laneH = roadH / n;
 
     ctx.strokeStyle = '#111';
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.moveTo(left, top);
-    ctx.lineTo(left, bottom);
+    ctx.moveTo(roadX, roadY);
+    ctx.lineTo(roadX + roadW, roadY);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(left + roadW, top);
-    ctx.lineTo(left + roadW, bottom);
+    ctx.moveTo(roadX, roadY + roadH);
+    ctx.lineTo(roadX + roadW, roadY + roadH);
     ctx.stroke();
 
     ctx.strokeStyle = '#555';
     ctx.lineWidth = 4;
     ctx.setLineDash([18, 16]);
     for (let i = 1; i < n; i++) {
-      const lx = left + laneW * i;
+      const ly = roadY + laneH * i;
       ctx.beginPath();
-      ctx.moveTo(lx, top);
-      ctx.lineTo(lx, bottom);
+      ctx.moveTo(roadX, ly);
+      ctx.lineTo(roadX + roadW, ly);
       ctx.stroke();
     }
     ctx.setLineDash([]);
 
-    const laneCentre = left + laneW * (plan.laneIndex + 0.5);
+    const laneCentreY = roadY + laneH * (plan.laneIndex + 0.5);
     const front = d.front_vehicle || 'A';
     const rear = d.rear_vehicle || 'B';
 
-    drawVehicleSprite(ctx, front, vehicleType(front, d), laneCentre - 36, 52, 72, 96, true);
-    drawVehicleSprite(ctx, rear, vehicleType(rear, d), laneCentre - 36, 174, 72, 96, true);
+    // Horizontal road: vehicles travel left-to-right, so no 90-degree rotation.
+    drawVehicleSprite(ctx, rear, vehicleType(rear, d), roadX + 200, laneCentreY - 34, 96, 68, false);
+    drawVehicleSprite(ctx, front, vehicleType(front, d), roadX + 315, laneCentreY - 34, 96, 68, false);
 
     ctx.fillStyle = '#111';
     ctx.font = 'bold 34px Arial';
-    ctx.fillText('X', laneCentre - 15, 170);
+    ctx.fillText('X', roadX + 302, laneCentreY + 10);
     ctx.font = 'bold 44px Arial';
-    ctx.fillText('↑', left + roadW / 2 - 13, 316);
+    ctx.fillText('→', roadX + 42, laneCentreY + 14);
 
     drawLegend(ctx, d);
-    drawLocation(ctx, d.road, left);
+    drawLocation(ctx, d.road, roadX, roadY, roadH);
   };
 
   loadIcons();
