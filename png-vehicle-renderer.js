@@ -114,10 +114,10 @@
     drawLabel(ctx, label, x + w / 2, y + h * 0.53, Math.max(13, Math.min(23, w * 0.30)));
   }
 
-  function drawLocation(ctx, road) {
+  function drawLocation(ctx, road, roadLeft) {
     if (!road) return;
     ctx.save();
-    ctx.translate(58, 210);
+    ctx.translate(roadLeft - 12, 230);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = '#111';
     ctx.font = 'bold 17px Arial';
@@ -133,32 +133,36 @@
     if (!rows.length) rows.push(['A/B', 'Vehicles', '']);
 
     ctx.save();
-    const x = 805, y = 120, w = 170, h = rows.length * 32 + 42;
+    const x = 745;
+    const y = 82;
+    const w = 240;
+    const rowH = 44;
+    const h = rows.length * rowH + 72;
     ctx.fillStyle = 'rgba(255,255,255,0.96)';
     ctx.strokeStyle = '#111';
-    ctx.lineWidth = 2.6;
+    ctx.lineWidth = 2.8;
     rr(ctx, x, y, w, h, 8);
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = '#111';
-    ctx.font = 'bold 13px Arial';
-    ctx.fillText('LEGEND', x + 10, y + 19);
+    ctx.font = 'bold 15px Arial';
+    ctx.fillText('LEGEND', x + 14, y + 24);
 
     rows.forEach((r, i) => {
-      const yy = y + 38 + i * 32;
-      drawVehicleSprite(ctx, r[0], r[2], x + 8, yy - 23, 38, 24, false);
+      const yy = y + 56 + i * rowH;
+      drawVehicleSprite(ctx, r[0], r[2], x + 14, yy - 23, 56, 30, false);
       ctx.fillStyle = '#111';
       ctx.font = 'bold 12px Arial';
-      ctx.fillText(r[0], x + 42, yy - 3);
-      ctx.font = 'bold 10px Arial';
-      ctx.fillText((r[1] || '') + (r[2] ? ' ' + r[2] : ''), x + 58, yy - 3);
+      ctx.fillText(r[0], x + 78, yy - 4);
+      ctx.font = 'bold 11px Arial';
+      ctx.fillText((r[1] || '') + (r[2] ? ' ' + r[2] : ''), x + 102, yy - 4);
     });
 
-    const iy = y + 38 + rows.length * 32;
-    ctx.font = 'bold 19px Arial';
-    ctx.fillText('X', x + 14, iy - 2);
-    ctx.font = 'bold 10px Arial';
-    ctx.fillText('Point of Impact', x + 36, iy - 4);
+    const iy = y + 56 + rows.length * rowH;
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText('X', x + 18, iy - 4);
+    ctx.font = 'bold 11px Arial';
+    ctx.fillText('Point of Impact', x + 54, iy - 8);
     ctx.restore();
   }
 
@@ -174,8 +178,8 @@
     const n = plan.lanes;
     const roadW = Math.min(300, n * 92);
     const left = 455 - roadW / 2;
-    const top = 12;
-    const bottom = 296;
+    const top = 0;
+    const bottom = 320;
     const laneW = roadW / n;
 
     ctx.strokeStyle = '#111';
@@ -215,7 +219,7 @@
     ctx.fillText('↑', left + roadW / 2 - 13, 316);
 
     drawLegend(ctx, d);
-    drawLocation(ctx, d.road);
+    drawLocation(ctx, d.road, left);
   };
 
   loadIcons();
